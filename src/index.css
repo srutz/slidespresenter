@@ -239,3 +239,22 @@ body {
     @apply font-sans;
   }
 }
+/* slide content (react-markdown output has no classes) */
+.slide {
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+.slide h1 { @apply text-3xl font-bold mb-4; }
+.slide h2 { @apply text-2xl font-semibold mt-6 mb-3; }
+.slide h3 { @apply text-xl font-semibold mt-4 mb-2; }
+.slide p { @apply my-3; }
+.slide ul { @apply list-disc pl-6 my-3; }
+.slide ol { @apply list-decimal pl-6 my-3; }
+.slide a { @apply text-blue-600 underline; }
+.slide img { @apply my-4 max-w-full; }
+.slide blockquote { @apply border-l-4 pl-4 italic text-muted-foreground; }
+.slide code { @apply rounded bg-muted px-1 py-0.5 text-[0.9em]; }
+.slide pre { @apply my-3 max-w-full overflow-x-auto rounded bg-muted p-4; }
+.slide pre code { @apply bg-transparent p-0; }
+.slide table { @apply my-3 border-collapse; }
+.slide th, .slide td { @apply border px-3 py-1; }

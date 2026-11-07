@@ -1,25 +1,21 @@
-import { ChevronDown } from "lucide-react";
 import {
 	Sidebar,
 	SidebarContent,
 	SidebarFooter,
-	SidebarGroup,
 	SidebarHeader,
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { PresentationMenu } from "./PresentationMenu";
 
-export function SideMenu() {
+type Props = React.ComponentProps<typeof PresentationMenu>;
+
+export function SideMenu(props: Props) {
 	return (
 		<Sidebar>
 			<SidebarHeader>
-				<span className="px-2 py-1 text-lg font-semibold">AppTitle</span>
+				<span className="px-2 py-1 text-lg font-semibold">Slides Presenter</span>
 			</SidebarHeader>
 			<SidebarContent>
-				<SidebarGroup />
-				<SidebarGroup />
+				<PresentationMenu {...props} />
 			</SidebarContent>
 			<SidebarFooter>
 				<span className="px-2 py-1 text-xs text-muted-foreground">(c) Stepan Rutz</span>
