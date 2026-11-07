@@ -17,7 +17,7 @@ export function SideMenu({ toc, ...props }: Props) {
 	return (
 		<Sidebar>
 			<SidebarHeader>
-				<span className="px-2 py-1 text-lg font-semibold">Slides Presenter</span>
+				<span className="px-2 py-1 font-semibold">Slides Presenter</span>
 			</SidebarHeader>
 			<SidebarContent>
 				<PresentationMenu {...props} />

@@ -290,3 +290,45 @@ body {
 [data-slot="sidebar-wrapper"][data-resizing] [data-slot="sidebar-container"] {
 	transition: none !important;
 }
+
+/* syntax highlighting (highlight.js token classes from rehype-highlight) */
+.slide .hljs-comment,
+.slide .hljs-quote {
+	color: #6a737d;
+	font-style: italic;
+}
+.slide .hljs-keyword,
+.slide .hljs-selector-tag,
+.slide .hljs-literal,
+.slide .hljs-doctag {
+	color: #d73a49;
+}
+.slide .hljs-string,
+.slide .hljs-regexp,
+.slide .hljs-addition {
+	color: #032f62;
+}
+.slide .hljs-number,
+.slide .hljs-attr,
+.slide .hljs-attribute,
+.slide .hljs-variable,
+.slide .hljs-template-variable {
+	color: #005cc5;
+}
+.slide .hljs-title,
+.slide .hljs-section,
+.slide .hljs-built_in,
+.slide .hljs-selector-class,
+.slide .hljs-selector-id {
+	color: #6f42c1;
+}
+.slide .hljs-type,
+.slide .hljs-name,
+.slide .hljs-tag {
+	color: #22863a;
+}
+.slide .hljs-meta,
+.slide .hljs-symbol,
+.slide .hljs-deletion {
+	color: #e36209;
+}

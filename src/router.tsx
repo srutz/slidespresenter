@@ -20,7 +20,9 @@ import {
 	type Presentation,
 	useSlides,
 } from "@/lib/presentations";
+import { FullscreenToggle } from "./components/app/FullscreenToggle";
 import { PresentationViewer } from "./components/app/PresentationViewer";
+import { SlideBreadcrumb } from "./components/app/SlideBreadcrumb";
 import { SideMenu } from "./components/app/SIdeMenu";
 
 const rootRoute = createRootRoute({
@@ -39,7 +41,8 @@ const rootRoute = createRootRoute({
 
 function RootLayout() {
 	const { presentations, error } = rootRoute.useLoaderData();
-	const { id } = useParams({ strict: false });
+	const { id, slide } = useParams({ strict: false });
+	const navigate = useNavigate();
 	const presentation = presentations?.find((p) => p.id === id) ?? null;
 
 	const slides = useSlides(presentation);
@@ -56,7 +59,20 @@ function RootLayout() {
 			<SidebarInset className="min-w-0 bg-taupe-100">
 				<header className="flex items-center gap-1 bg-white px-3 py-1">
 					<SidebarTrigger />
-					<span className="text-sm font-medium">{presentation?.id}</span>
+					{presentation && (
+						<SlideBreadcrumb
+							presentationId={presentation.id}
+							toc={toc}
+							slide={Math.max(0, (Number(slide) || 1) - 1)}
+							onNavigate={(i) =>
+								navigate({
+									to: "/$id/$slide",
+									params: { id: presentation.id, slide: String(i + 1) },
+								})
+							}
+						/>
+					)}
+					<FullscreenToggle />
 				</header>
 				<Outlet />
 			</SidebarInset>
@@ -100,6 +116,7 @@ function SlidePage() {
 	const presentation: Presentation | null =
 		presentations?.find((p) => p.id === id) ?? null;
 	const slides = useSlides(presentation);
+	const toc = useMemo(() => (slides ? buildToc(slides) : []), [slides]);
 	const index = Math.max(0, (Number(slide) || 1) - 1);
 	const clamped = slides ? Math.min(index, slides.length - 1) : 0;
 
@@ -107,6 +124,7 @@ function SlidePage() {
 		<PresentationViewer
 			presentation={presentation}
 			slides={slides}
+			toc={toc}
 			index={clamped}
 			onIndexChange={(i) =>
 				navigate({

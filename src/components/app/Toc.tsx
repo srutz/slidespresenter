@@ -1,6 +1,6 @@
 import { Collapsible } from "@base-ui/react/collapsible";
 import { Link, useParams } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Play } from "lucide-react";
 import {
 	SidebarGroup,
 	SidebarGroupLabel,
@@ -49,6 +49,12 @@ function TocItem({
 			<span className="wrap-break-word" title={node.title}>
 				{node.title}
 			</span>
+			{active && (
+				<Play
+					aria-label="Current slide"
+					className="ml-1.5 size-3 shrink-0 fill-current"
+				/>
+			)}
 		</Link>
 	);
 
