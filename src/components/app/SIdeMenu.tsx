@@ -4,11 +4,16 @@ import {
 	SidebarFooter,
 	SidebarHeader,
 } from "@/components/ui/sidebar";
+import type { TocNode } from "@/lib/presentations";
 import { PresentationMenu } from "./PresentationMenu";
+import { SidebarResizeHandle } from "./SidebarResizeHandle";
+import { Toc } from "./Toc";
 
-type Props = React.ComponentProps<typeof PresentationMenu>;
+type Props = React.ComponentProps<typeof PresentationMenu> & {
+	toc: TocNode[];
+};
 
-export function SideMenu(props: Props) {
+export function SideMenu({ toc, ...props }: Props) {
 	return (
 		<Sidebar>
 			<SidebarHeader>
@@ -16,10 +21,14 @@ export function SideMenu(props: Props) {
 			</SidebarHeader>
 			<SidebarContent>
 				<PresentationMenu {...props} />
+				{props.selectedId && <Toc presentationId={props.selectedId} toc={toc} />}
 			</SidebarContent>
 			<SidebarFooter>
-				<span className="px-2 py-1 text-xs text-muted-foreground">(c) Stepan Rutz</span>
+				<span className="px-2 py-1 text-xs text-muted-foreground">
+					(c) Stepan Rutz
+				</span>
 			</SidebarFooter>
+			<SidebarResizeHandle />
 		</Sidebar>
 	);
 }

@@ -7,20 +7,10 @@ export type Presentation = {
 	slides: string[];
 };
 
-export function usePresentations() {
-	const [presentations, setPresentations] = useState<Presentation[] | null>(
-		null,
+export function fetchPresentations(): Promise<Presentation[]> {
+	return fetch("/presentations.json").then((r) =>
+		r.ok ? r.json() : Promise.reject(new Error(r.statusText)),
 	);
-	const [error, setError] = useState<string | null>(null);
-
-	useEffect(() => {
-		fetch("/presentations.json")
-			.then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.statusText))))
-			.then(setPresentations)
-			.catch((e) => setError(String(e)));
-	}, []);
-
-	return { presentations, error };
 }
 
 /**
@@ -65,8 +55,7 @@ export function useSlides(p: Presentation | null) {
 					.catch(() => `**Error loading ${file}**`),
 			),
 		).then((texts) => {
-			if (!cancelled)
-				setLoaded({ id: p.id, slides: texts.flatMap(splitSlides) });
+			if (!cancelled) setLoaded({ id: p.id, slides: texts.flatMap(splitSlides) });
 		});
 		return () => {
 			cancelled = true;
@@ -74,4 +63,98 @@ export function useSlides(p: Presentation | null) {
 	}, [p]);
 
 	return p && loaded?.id === p.id ? loaded.slides : null;
+}
+
+export type TocNode = {
+	title: string;
+	/** 0-based index of the slide containing the heading */
+	slide: number;
+	level: number;
+	children: TocNode[];
+	/** chapter entry generated from the common title prefix, not a heading */
+	synthetic?: boolean;
+};
+
+const stripInline = (s: string) =>
+	s
+		.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+		.replace(/[`*_~]/g, "")
+		.trim();
+
+/** Builds a hierarchical table of contents from the headings of all slides. */
+export function buildToc(slides: string[]): TocNode[] {
+	const roots: TocNode[] = [];
+	const stack: TocNode[] = [];
+	slides.forEach((slide, slideIndex) => {
+		let fence: string | null = null;
+		for (const line of slide.split(/\r?\n/)) {
+			const f = line.match(/^\s*(```+|~~~+)/);
+			if (f) {
+				if (!fence) fence = f[1][0];
+				else if (f[1][0] === fence) fence = null;
+				continue;
+			}
+			if (fence) continue;
+			const m = line.match(/^(#{1,6})\s+(.+?)\s*#*\s*$/);
+			if (!m) continue;
+			const node: TocNode = {
+				title: stripInline(m[2]),
+				slide: slideIndex,
+				level: m[1].length,
+				children: [],
+			};
+			while (stack.length && stack[stack.length - 1].level >= node.level)
+				stack.pop();
+			(stack.length ? stack[stack.length - 1].children : roots).push(node);
+			stack.push(node);
+		}
+	});
+	return groupChapters(mergeSameTitle(roots));
+}
+
+/** Consecutive top-level headings with an identical title become one entry. */
+function mergeSameTitle(nodes: TocNode[]): TocNode[] {
+	const out: TocNode[] = [];
+	for (const n of nodes) {
+		const prev = out[out.length - 1];
+		if (prev && prev.title === n.title) prev.children.push(...n.children);
+		else out.push({ ...n, children: [...n.children] });
+	}
+	return out;
+}
+
+// "2.1 React Einführung / Überblick" -> number "2.1", chapter, rest
+const CHAPTER_RE = /^(\d+(?:\.\d+)?)\s+(.+?)\s+\/\s+(.+)$/;
+
+/**
+ * Top-level titles of the form "<n.m> <Chapter> / <Title>" are grouped below
+ * a synthetic "<n> <Chapter>" entry and shortened to "<n.m> <Title>".
+ */
+function groupChapters(nodes: TocNode[]): TocNode[] {
+	const out: TocNode[] = [];
+	let chapterKey: string | null = null;
+	for (const n of nodes) {
+		const m = n.title.match(CHAPTER_RE);
+		if (!m) {
+			out.push(n);
+			chapterKey = null;
+			continue;
+		}
+		const key = `${m[1].split(".")[0]} ${m[2]}`;
+		const item = { ...n, title: `${m[1]} ${m[3]}` };
+		const prev = out[out.length - 1];
+		if (chapterKey === key && prev?.synthetic) {
+			prev.children.push(item);
+		} else {
+			out.push({
+				title: key,
+				slide: n.slide,
+				level: 0,
+				children: [item],
+				synthetic: true,
+			});
+			chapterKey = key;
+		}
+	}
+	return out;
 }

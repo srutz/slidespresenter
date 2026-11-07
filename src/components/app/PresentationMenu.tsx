@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Presentation as PresentationIcon } from "lucide-react";
 import {
 	SidebarGroup,
@@ -12,15 +13,9 @@ type Props = {
 	presentations: Presentation[] | null;
 	error: string | null;
 	selectedId: string | null;
-	onSelect: (id: string) => void;
 };
 
-export function PresentationMenu({
-	presentations,
-	error,
-	selectedId,
-	onSelect,
-}: Props) {
+export function PresentationMenu({ presentations, error, selectedId }: Props) {
 	return (
 		<SidebarGroup>
 			<SidebarGroupLabel>Presentations</SidebarGroupLabel>
@@ -38,7 +33,7 @@ export function PresentationMenu({
 					<SidebarMenuItem key={p.id}>
 						<SidebarMenuButton
 							isActive={p.id === selectedId}
-							onClick={() => onSelect(p.id)}
+							render={<Link to="/$id/$slide" params={{ id: p.id, slide: "1" }} />}
 						>
 							<PresentationIcon />
 							<span>{p.id}</span>
