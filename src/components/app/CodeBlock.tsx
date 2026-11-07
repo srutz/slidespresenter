@@ -1,4 +1,5 @@
 import { Check, Copy, Ellipsis, Type } from "lucide-react";
+import { useLocalStorage } from "@uidotdev/usehooks";
 import { type ComponentProps, useRef, useState } from "react";
 import {
 	DropdownMenu,
@@ -26,7 +27,7 @@ export function CodeBlock({
 	...props
 }: ComponentProps<"pre"> & { node?: unknown }) {
 	const ref = useRef<HTMLPreElement>(null);
-	const [size, setSize] = useState("1");
+	const [size, setSize] = useLocalStorage("codeblock-font-size", "1");
 	const [copied, setCopied] = useState(false);
 
 	const copy = async () => {
