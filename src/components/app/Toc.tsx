@@ -44,9 +44,11 @@ function TocItem({
 			to="/$id/$slide"
 			params={{ id: presentationId, slide: String(node.slide + 1) }}
 			data-active={active || undefined}
-			className="flex h-7 min-w-0 flex-1 items-center overflow-hidden rounded-md px-2 text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:font-medium"
+			className="flex min-h-7 min-w-0 flex-1 items-center rounded-md px-2 py-0.5 text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:font-medium"
 		>
-			<span className="truncate">{node.title}</span>
+			<span className="wrap-break-word" title={node.title}>
+				{node.title}
+			</span>
 		</Link>
 	);
 

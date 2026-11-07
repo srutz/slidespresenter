@@ -125,36 +125,55 @@ function mergeSameTitle(nodes: TocNode[]): TocNode[] {
 
 // "2.1 React Einführung / Überblick" -> number "2.1", chapter, rest
 const CHAPTER_RE = /^(\d+(?:\.\d+)?)\s+(.+?)\s+\/\s+(.+)$/;
+// unnumbered: "React Patterns / P1 - Foo" -> chapter, rest
+const TOPIC_RE = /^(.+?)\s+\/\s+(.+)$/;
 
 /**
  * Top-level titles of the form "<n.m> <Chapter> / <Title>" are grouped below
- * a synthetic "<n> <Chapter>" entry and shortened to "<n.m> <Title>".
+ * a synthetic "<n> <Chapter>" entry (even when interrupted by other entries)
+ * and shortened to "<n.m> <Title>". Unnumbered "<Topic> / <Title>" entries are
+ * grouped below "<Topic>" (an existing heading of that name is reused).
  */
 function groupChapters(nodes: TocNode[]): TocNode[] {
 	const out: TocNode[] = [];
-	let chapterKey: string | null = null;
+	const numbered = new Map<string, TocNode>();
 	for (const n of nodes) {
 		const m = n.title.match(CHAPTER_RE);
-		if (!m) {
-			out.push(n);
-			chapterKey = null;
+		if (m) {
+			const key = `${m[1].split(".")[0]} ${m[2]}`;
+			const item = { ...n, title: `${m[1]} ${m[3]}` };
+			const group = numbered.get(key);
+			if (group) group.children.push(item);
+			else {
+				const g: TocNode = {
+					title: key,
+					slide: n.slide,
+					level: 0,
+					children: [item],
+					synthetic: true,
+				};
+				numbered.set(key, g);
+				out.push(g);
+			}
 			continue;
 		}
-		const key = `${m[1].split(".")[0]} ${m[2]}`;
-		const item = { ...n, title: `${m[1]} ${m[3]}` };
-		const prev = out[out.length - 1];
-		if (chapterKey === key && prev?.synthetic) {
-			prev.children.push(item);
-		} else {
+		const t = n.title.match(TOPIC_RE);
+		if (t) {
+			const prev = out[out.length - 1];
+			if (prev && prev.title === t[1] && !numbered.has(t[1])) {
+				prev.children.push({ ...n, title: t[2] });
+				continue;
+			}
 			out.push({
-				title: key,
+				title: t[1],
 				slide: n.slide,
 				level: 0,
-				children: [item],
+				children: [{ ...n, title: t[2] }],
 				synthetic: true,
 			});
-			chapterKey = key;
+			continue;
 		}
+		out.push(n);
 	}
 	return out;
 }
