@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#000" />
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="400" y="30" font-size="24" text-anchor="middle" font-weight="bold">React Re-rendering on State Change</text>
+  
+  <!-- Parent Component -->
+  <rect x="250" y="60" width="300" height="80" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+  <text x="400" y="100" font-size="18" text-anchor="middle">Parent Component</text>
+  
+  <!-- Component with State Change -->
+  <rect x="100" y="180" width="250" height="100" fill="#ffe6e6" stroke="#000" stroke-width="2" />
+  <text x="225" y="220" font-size="16" text-anchor="middle">Component with State Change</text>
+  <text x="225" y="245" font-size="14" text-anchor="middle">(Re-renders)</text>
+  
+  <!-- Sibling Component -->
+  <rect x="450" y="180" width="250" height="100" fill="#e6f3ff" stroke="#000" stroke-width="2" />
+  <text x="575" y="220" font-size="16" text-anchor="middle">Sibling Component</text>
+  <text x="575" y="245" font-size="14" text-anchor="middle">(Does not re-render)</text>
+  
+  <!-- Child Components -->
+  <rect x="50" y="320" width="150" height="80" fill="#ffe6e6" stroke="#000" stroke-width="2" />
+  <text x="125" y="360" font-size="14" text-anchor="middle">Child 1</text>
+  <text x="125" y="380" font-size="12" text-anchor="middle">(Re-renders)</text>
+  
+  <rect x="250" y="320" width="150" height="80" fill="#ffe6e6" stroke="#000" stroke-width="2" />
+  <text x="325" y="360" font-size="14" text-anchor="middle">Child 2</text>
+  <text x="325" y="380" font-size="12" text-anchor="middle">(Re-renders)</text>
+  
+  <rect x="500" y="320" width="150" height="80" fill="#e6f3ff" stroke="#000" stroke-width="2" />
+  <text x="575" y="360" font-size="14" text-anchor="middle">Sibling's Child</text>
+  <text x="575" y="380" font-size="12" text-anchor="middle">(Does not re-render)</text>
+  
+  <!-- Memoized Component -->
+  <rect x="150" y="440" width="150" height="80" fill="#e6ffe6" stroke="#000" stroke-width="2" />
+  <text x="225" y="470" font-size="14" text-anchor="middle">Memoized Child</text>
+  <text x="225" y="490" font-size="12" text-anchor="middle">(May not re-render)</text>
+  
+  <!-- Arrows -->
+  <line x1="400" y1="140" x2="225" y2="170" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)" />
+  <line x1="400" y1="140" x2="575" y2="170" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)" />
+  <line x1="225" y1="280" x2="125" y2="310" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)" />
+  <line x1="225" y1="280" x2="325" y2="310" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)" />
+  <line x1="225" y1="280" x2="225" y2="430" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)" />
+  <line x1="575" y1="280" x2="575" y2="310" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)" />
+  
+  <!-- Legend -->
+  <rect x="600" y="440" width="20" height="20" fill="#ffe6e6" stroke="#000" />
+  <text x="630" y="455" font-size="12" dominant-baseline="middle">Re-renders</text>
+  <rect x="600" y="470" width="20" height="20" fill="#e6f3ff" stroke="#000" />
+  <text x="630" y="485" font-size="12" dominant-baseline="middle">Does not re-render</text>
+  <rect x="600" y="500" width="20" height="20" fill="#e6ffe6" stroke="#000" />
+  <text x="630" y="515" font-size="12" dominant-baseline="middle">May not re-render (if memoized)</text>
+</svg>

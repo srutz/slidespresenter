@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+  </defs>
+  
+  <!-- Main Container -->
+  <rect x="50" y="50" width="700" height="500" fill="#f0f0f0" stroke="#333" stroke-width="2" />
+  <text x="60" y="80" font-family="Arial" font-size="18">View (Container)</text>
+  
+  <!-- Image Container -->
+  <rect x="100" y="100" width="250" height="200" fill="#e1f5fe" stroke="#333" stroke-width="2" />
+  <text x="110" y="130" font-family="Arial" font-size="16">View (Image Container)</text>
+  <rect x="125" y="150" width="200" height="120" fill="#81d4fa" stroke="#333" stroke-width="2" />
+  <text x="135" y="180" font-family="Arial" font-size="14">Image (Fixed Size)</text>
+  
+  <!-- Description Container -->
+  <rect x="100" y="320" width="600" height="100" fill="#e8f5e9" stroke="#333" stroke-width="2" />
+  <text x="110" y="350" font-family="Arial" font-size="16">View (Description Container)</text>
+  <rect x="125" y="370" width="550" height="30" fill="#a5d6a7" stroke="#333" stroke-width="2" />
+  <text x="135" y="390" font-family="Arial" font-size="14">Text (Product Description)</text>
+  
+  <!-- Price Container -->
+  <rect x="400" y="100" width="300" height="200" fill="#fff3e0" stroke="#333" stroke-width="2" />
+  <text x="410" y="130" font-family="Arial" font-size="16">View (Price Container)</text>
+  <rect x="425" y="150" width="250" height="50" fill="#ffe0b2" stroke="#333" stroke-width="2" />
+  <text x="435" y="180" font-family="Arial" font-size="14">Text (Price)</text>
+  
+  <!-- Growth Arrows -->
+  <!-- Main container growth -->
+  <line x1="750" y1="300" x2="780" y2="300" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <line x1="400" y1="550" x2="400" y2="580" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  
+  <!-- Description container growth -->
+  <line x1="700" y1="370" x2="730" y2="370" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  
+  <!-- Price container growth -->
+  <line x1="700" y1="200" x2="730" y2="200" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  <line x1="550" y1="300" x2="550" y2="330" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+  
+  <!-- Legend -->
+  <text x="60" y="570" font-family="Arial" font-size="14">Legend: → Growth Direction</text>
+</svg>
