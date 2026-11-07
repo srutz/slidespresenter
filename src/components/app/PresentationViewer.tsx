@@ -1,12 +1,16 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
+import { useSettings } from "@/lib/settings";
 import type { Presentation, TocNode } from "@/lib/presentations";
 import { CodeBlock } from "./CodeBlock";
 import { SlideToc } from "./SlideToc";
+
+/** width in px the slide is laid out at before scaling */
+const FIT_WIDTH = 1280;
 
 type Props = {
 	presentation: Presentation | null;
@@ -26,6 +30,40 @@ export function PresentationViewer({
 	onIndexChange,
 }: Props) {
 	const count = slides?.length ?? 0;
+	const [{ scaleToFit }] = useSettings();
+	const containerRef = useRef<HTMLDivElement>(null);
+	const articleRef = useRef<HTMLElement>(null);
+	const [fit, setFit] = useState({ scale: 1, height: 0 });
+
+	// scale the slide (laid out at FIT_WIDTH) so it fits the container
+	useLayoutEffect(() => {
+		const container = containerRef.current;
+		const article = articleRef.current;
+		if (!scaleToFit || !container || !article) return;
+		function measure() {
+			if (!container || !article) return;
+			const cs = getComputedStyle(container);
+			const w =
+				container.clientWidth -
+				parseFloat(cs.paddingLeft) -
+				parseFloat(cs.paddingRight);
+			const h =
+				container.clientHeight -
+				parseFloat(cs.paddingTop) -
+				parseFloat(cs.paddingBottom);
+			const height = article.offsetHeight;
+			if (w <= 0 || h <= 0 || height <= 0) return;
+			const scale = Math.min(w / FIT_WIDTH, h / height);
+			setFit((f) =>
+				f.scale === scale && f.height === height ? f : { scale, height },
+			);
+		}
+		measure();
+		const ro = new ResizeObserver(measure);
+		ro.observe(container);
+		ro.observe(article);
+		return () => ro.disconnect();
+	}, [scaleToFit]);
 
 	useEffect(() => {
 		function onKey(e: KeyboardEvent) {
@@ -66,30 +104,57 @@ export function PresentationViewer({
 
 	return (
 		<div className="grow h-1 min-w-0 flex flex-col">
-			<div className="grow overflow-y-auto overflow-x-hidden px-2.5 py-6">
-				<article className="slide min-w-0 mx-auto max-w-7xl rounded-lg bg-white p-10 shadow-sm">
-					{parts.map((part, i) => (
-						<Fragment key={i === 1 ? "toc" : i}>
-							{i === 1 && <SlideToc toc={toc} id={presentation.id} />}
-							{part && (
-								<ReactMarkdown
-									remarkPlugins={[remarkGfm]}
-									components={{ pre: CodeBlock }}
-									rehypePlugins={[[rehypeHighlight, { detect: false }]]}
-									urlTransform={(u) =>
-										/^([a-z]+:|\/|#)/i.test(u)
-											? u
-											: base + u.replace(/^\.\//, "")
+			<div
+				ref={containerRef}
+				className={
+					scaleToFit
+						? "grow overflow-hidden px-2.5 py-6 flex"
+						: "grow overflow-y-auto overflow-x-hidden px-2.5 py-6"
+				}
+			>
+				<div
+					className={scaleToFit ? "m-auto shrink-0" : "contents"}
+					style={
+						scaleToFit
+							? { width: FIT_WIDTH * fit.scale, height: fit.height * fit.scale }
+							: undefined
+					}
+				>
+					<article
+						ref={articleRef}
+						className="slide min-w-0 mx-auto max-w-7xl rounded-lg bg-white p-10 shadow-sm"
+						style={
+							scaleToFit
+								? {
+										width: FIT_WIDTH,
+										maxWidth: "none",
+										transform: `scale(${fit.scale})`,
+										transformOrigin: "top left",
 									}
-								>
-									{part}
-								</ReactMarkdown>
-							)}
-						</Fragment>
-					))}
-				</article>
+								: undefined
+						}
+					>
+						{parts.map((part, i) => (
+							<Fragment key={i === 1 ? "toc" : i}>
+								{i === 1 && <SlideToc toc={toc} id={presentation.id} />}
+								{part && (
+									<ReactMarkdown
+										remarkPlugins={[remarkGfm]}
+										components={{ pre: CodeBlock }}
+										rehypePlugins={[[rehypeHighlight, { detect: false }]]}
+										urlTransform={(u) =>
+											/^([a-z]+:|\/|#)/i.test(u) ? u : base + u.replace(/^\.\//, "")
+										}
+									>
+										{part}
+									</ReactMarkdown>
+								)}
+							</Fragment>
+						))}
+					</article>
+				</div>
 			</div>
-			<footer className="flex items-center justify-center gap-3 bg-white px-3 py-1">
+			<footer className="chrome flex items-center justify-center gap-3 bg-white px-3 py-1">
 				<Button
 					variant="ghost"
 					size="icon"

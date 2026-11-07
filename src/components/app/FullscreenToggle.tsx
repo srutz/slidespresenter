@@ -1,17 +1,10 @@
 import { Maximize, Minimize } from "lucide-react";
-import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-
-function subscribe(cb: () => void) {
-	document.addEventListener("fullscreenchange", cb);
-	return () => document.removeEventListener("fullscreenchange", cb);
-}
+import { useIsFullscreen } from "@/lib/fullscreen";
 
 export function FullscreenToggle() {
-	const isFullscreen = useSyncExternalStore(
-		subscribe,
-		() => document.fullscreenElement !== null,
-	);
+	const isFullscreen = useIsFullscreen();
 
 	const toggle = useCallback(() => {
 		if (document.fullscreenElement) void document.exitFullscreen();
@@ -37,7 +30,7 @@ export function FullscreenToggle() {
 		<Button
 			variant="ghost"
 			size="icon"
-			className="ml-auto shrink-0"
+			className="shrink-0"
 			onClick={toggle}
 			aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
 			title={`${isFullscreen ? "Exit fullscreen" : "Enter fullscreen"} (F)`}

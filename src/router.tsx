@@ -3,12 +3,17 @@ import {
 	createRootRoute,
 	createRoute,
 	createRouter,
+	Link,
 	Outlet,
 	redirect,
+	useCanGoBack,
 	useNavigate,
 	useParams,
+	useRouter,
 } from "@tanstack/react-router";
+import { Settings } from "lucide-react";
 import { useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import {
 	SidebarInset,
 	SidebarProvider,
@@ -20,8 +25,10 @@ import {
 	type Presentation,
 	useSlides,
 } from "@/lib/presentations";
+import { ChromeAutoHide } from "./components/app/ChromeAutoHide";
 import { FullscreenToggle } from "./components/app/FullscreenToggle";
 import { PresentationViewer } from "./components/app/PresentationViewer";
+import { SettingsDialog } from "./components/app/SettingsDialog";
 import { SlideBreadcrumb } from "./components/app/SlideBreadcrumb";
 import { SideMenu } from "./components/app/SIdeMenu";
 
@@ -50,6 +57,7 @@ function RootLayout() {
 
 	return (
 		<SidebarProvider>
+			<ChromeAutoHide />
 			<SideMenu
 				toc={toc}
 				presentations={presentations}
@@ -57,7 +65,7 @@ function RootLayout() {
 				selectedId={presentation?.id ?? null}
 			/>
 			<SidebarInset className="min-w-0 bg-taupe-100">
-				<header className="flex items-center gap-1 bg-white px-3 py-1">
+				<header className="chrome flex items-center gap-1 bg-white px-3 py-1">
 					<SidebarTrigger />
 					{presentation && (
 						<SlideBreadcrumb
@@ -72,7 +80,18 @@ function RootLayout() {
 							}
 						/>
 					)}
-					<FullscreenToggle />
+					<div className="ml-auto flex items-center">
+						<FullscreenToggle />
+						<Button
+							variant="ghost"
+							size="icon"
+							aria-label="Settings"
+							title="Settings"
+							render={<Link to="/settings" />}
+						>
+							<Settings />
+						</Button>
+					</div>
 				</header>
 				<Outlet />
 			</SidebarInset>
@@ -136,8 +155,27 @@ function SlidePage() {
 	);
 }
 
+// /settings -> settings dialog (static route wins over /$id)
+const settingsRoute = createRoute({
+	getParentRoute: () => rootRoute,
+	path: "/settings",
+	component: SettingsPage,
+});
+
+function SettingsPage() {
+	const navigate = useNavigate();
+	const canGoBack = useCanGoBack();
+	const router = useRouter();
+	return (
+		<SettingsDialog
+			onClose={() => (canGoBack ? router.history.back() : navigate({ to: "/" }))}
+		/>
+	);
+}
+
 const routeTree = rootRoute.addChildren([
 	indexRoute,
+	settingsRoute,
 	presentationRoute,
 	slideRoute,
 ]);

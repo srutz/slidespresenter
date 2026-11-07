@@ -332,3 +332,12 @@ body {
 .slide .hljs-deletion {
 	color: #e36209;
 }
+
+/* fullscreen: ChromeAutoHide sets data-chrome-hidden while the mouse is idle */
+html[data-chrome-hidden] .chrome,
+html[data-chrome-hidden] [data-slot="sidebar"] {
+	display: none;
+}
+html[data-chrome-hidden] {
+	cursor: none;
+}

@@ -7,10 +7,7 @@ function Items({ nodes, id }: { nodes: TocNode[]; id: string }) {
 			{nodes.map((n, i) => (
 				// biome-ignore lint/suspicious/noArrayIndexKey: static list
 				<li key={i}>
-					<Link
-						to="/$id/$slide"
-						params={{ id, slide: String(n.slide + 1) }}
-					>
+					<Link to="/$id/$slide" params={{ id, slide: String(n.slide + 1) }}>
 						{n.title}
 					</Link>
 					{n.children.length > 0 && <Items nodes={n.children} id={id} />}
