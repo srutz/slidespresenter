@@ -59,7 +59,11 @@ function CodeBlockInner({
 			<pre
 				{...props}
 				ref={ref}
-				style={{ fontSize: `${size}em`, marginTop: 0, marginBottom: 0 }}
+				style={{
+					fontSize: `calc(${size}em - 2px)`,
+					marginTop: 0,
+					marginBottom: 0,
+				}}
 			>
 				{children}
 			</pre>
