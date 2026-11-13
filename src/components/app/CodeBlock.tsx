@@ -1,6 +1,7 @@
 import { Check, Copy, Ellipsis, Type } from "lucide-react";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { type ComponentProps, useRef, useState } from "react";
+import { type ComponentProps, isValidElement, useRef, useState } from "react";
+import { Mermaid } from "./Mermaid";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -26,6 +27,19 @@ export function CodeBlock({
 	node: _node,
 	...props
 }: ComponentProps<"pre"> & { node?: unknown }) {
+	if (isValidElement<ComponentProps<"code">>(children)) {
+		const { className, children: code } = children.props;
+		if (/\blanguage-mermaid\b/.test(className ?? "")) {
+			return <Mermaid chart={String(code ?? "").trim()} />;
+		}
+	}
+	return <CodeBlockInner {...props}>{children}</CodeBlockInner>;
+}
+
+function CodeBlockInner({
+	children,
+	...props
+}: ComponentProps<"pre">) {
 	const ref = useRef<HTMLPreElement>(null);
 	const [size, setSize] = useLocalStorage("codeblock-font-size", "1");
 	const [copied, setCopied] = useState(false);
