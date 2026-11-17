@@ -1,0 +1,443 @@
+=====================================================================
+ DOZENTEN-CHEATSHEET  -  REACT POWERWORKSHOP  (3 Tage)
+ Basis: public/react_powerworkshop (22 Kapitel, 222 Folien)
+=====================================================================
+
+0. ZIEL UND LEITFADEN
+---------------------------------------------------------------------
+Roter Faden (in Folie 16.1 als Stack-Bild):
+  React + TS + Vite -> Tailwind -> Router -> Zustand -> TanStack Query
+  -> React Hook Form + Zod -> useHooks -> Vitest/RTL/MSW -> Playwright
+
+Leitsatz, den man oft wiederholt:
+  "Jeder Baustein löst genau ein Problem."
+  Client State  -> useState / Context / Zustand
+  Server State  -> TanStack Query
+  URL State     -> Router
+  Form State    -> React Hook Form + Zod
+
+Grundregeln, die über 3 Tage immer wieder auftauchen:
+  1. UI = Funktion(State). State ändern -> React rendert neu.
+  2. State nie mutieren, immer neue Objekte/Arrays (Spread).
+  3. Abgeleitete Werte beim Rendern berechnen, nicht in State/Effect.
+  4. useEffect nur für Synchronisation mit der Außenwelt.
+  5. Server-Daten nicht in einen Store kopieren (TanStack Query).
+  6. Erst messen, dann optimieren (memo/useMemo/useCallback).
+
+Folienzahl pro Kapitel (für die Zeitplanung):
+  K1:2  K2:9  K3:12  K4:13  K5:13  K6:9  K7:20  K8:6  K9:14  K10:14
+  K11:14  K12:19  K13:12  K14:9  K15:9  K16:1  K17:14  K18:4  K19:1
+  K20:3  K21:1  K22:22
+
+Zusatzmaterial laut Folie 1.1: Slides (static.stepanrutz.com/reactworkshop),
+Beispielprojekte "reactsolitaire" (Spaß) und "remixpastebin" (Pastebin).
+
+
+1. ZEITPLAN-ÜBERBLICK
+---------------------------------------------------------------------
+Täglich ca. 09:00-16:30, Pausen: 10:30 (15'), 12:30 Mittag (60'), 14:45 (15').
+Netto ca. 5,5 h Lehrzeit pro Tag, davon mind. 40% Live-Coding/Übung.
+
+  TAG 1  Fundament:        K1, K2, K3, K4 (+ Anfang K5)
+  TAG 2  Vertiefung/Daten: K5, K6, K7, K8, K9
+  TAG 3  App-Bausteine:    K10, K11, K12, K13, K14, K15, K16 (+ Zusatz)
+
+Wenn die Zeit knapp wird, Reihenfolge der Kürzungen (zuerst streichen):
+  K22 (SemVer) -> K17 (Legacy) -> K21 (Next) -> K19/K20 -> K18 (Auth)
+  -> K12.11-12.15 (klassisches Redux) -> K8 -> K11.14 (TanStack Form)
+
+
+2. TAG 1 - FUNDAMENT
+=====================================================================
+
+[09:00-09:30] K1 Begrüßung, Erwartungen, Agenda (2 Folien, 30')
+---------------------------------------------------------------------
+- Abfrage: Vorkenntnisse (JS/TS, HTML/CSS, andere Frameworks, npm, Vite,
+  HTTP). Auf Flipchart notieren; daran später anknüpfen.
+- Agenda-Folie zeigen, ausdrücklich sagen: K17-22 sind Zusatz/Backup.
+- Entwicklungsumgebung prüfen: Node LTS, npm, Editor (VS Code),
+  Browser mit React DevTools, git.
+- Tipp: Wer es nicht zum Laufen bringt, sofort mit Online-Playground
+  (StackBlitz/CodeSandbox, siehe 2.1) weiterarbeiten lassen.
+
+[09:30-11:15] K2 React Einführung (9 Folien, ca. 105')
+---------------------------------------------------------------------
+Kernaussagen:
+- React ist eine UI-Bibliothek, kein Full-Framework (kein Router, kein
+  Datenlayer). Deshalb der "Seminar-Stack" aus K16.
+- Deklarativ: Man beschreibt, wie die UI zu einem State aussieht.
+- Komponenten sind Funktionen, die JSX zurückgeben.
+- Alternativen (2.4): Angular, Vue, Svelte, Solid. Gemeinsamkeiten
+  betonen (Komponenten, Reaktivität), keine Glaubenskriege.
+Demo/Live:
+- 2.5: "npm create vite@latest" -> React + TypeScript. Dev-Server starten,
+  Dateien durchgehen (index.html, main.tsx, App.tsx, vite.config.ts).
+- 2.6 Ordnerstruktur ist die längste Folie (13 KB): nicht vorlesen,
+  nur durchscrollen. Wichtig: package.json, lock-Datei, import von Assets,
+  Vite-Proxy (2.5) für API-Aufrufe ohne CORS-Ärger.
+- React DevTools installieren und Komponentenbaum zeigen.
+- JSX (2.8/2.9): Regeln - ein Root-Element/Fragment, className statt
+  class, {} für Ausdrücke, Self-Closing-Tags, camelCase-Attribute,
+  Kommentare {/* */}. Bedingung: && und Ternary; Listen: map + key.
+  JSX wird zu JS kompiliert (kein Template-System!).
+Häufige Fragen:
+- "Warum className?"  class ist reserviertes JS-Wort.
+- "Ist das nicht HTML in JS?"  Nein, Syntax-Zucker für Funktionsaufrufe.
+- "CRA?"  Tot/deprecated, deshalb Vite (K17.2 nur Legacy).
+Mini-Übung (10'): Hello-World-Seite mit Liste aus Array (map) und
+einer bedingten Anzeige.
+
+[11:15-12:30] K3 Komponenten, Props, State - Teil 1 (3.1-3.6)
+---------------------------------------------------------------------
+Kernaussagen:
+- Komponentennamen groß (PascalCase), sonst wird es als HTML-Tag gesehen.
+- Props sind read-only, fließen top-down. children = Inhalt zwischen Tags.
+- Rendering-Modell (3.1, mehrere Folien + Diagramme): WICHTIGSTER
+  Gedanke des Kurses. Render-Phase (Komponenten aufrufen, Virtual DOM
+  vergleichen) vs. Commit-Phase (DOM ändern). Auslöser für Re-Render:
+  State-Änderung, Eltern rendert neu, Context-Änderung.
+- Re-Render heißt NICHT, dass das DOM neu gebaut wird.
+Demo/Live:
+- Counter mit useState; console.log im Render zeigen.
+- Props mit TypeScript typisieren, Destructuring, Default-Werte,
+  boolesche Props, children.
+- Event-Handler: onClick={handler}  NICHT onClick={handler()}.
+Falle: Funktion aufrufen statt übergeben -> Endlosschleife/Warnung.
+
+[12:30-13:30] MITTAG
+
+[13:30-15:00] K3 Teil 2 (3.7-3.12)
+---------------------------------------------------------------------
+Kernaussagen useState (3.7 ist die zweitlängste Folie):
+- Rules of Hooks: nur auf Top-Level, nur in Komponenten/Custom Hooks.
+- State-Update ist asynchron/gebündelt: nach setX liest man im selben
+  Render noch den alten Wert.
+- Funktionsvariante setX(prev => prev + 1), wenn neuer Wert vom alten
+  abhängt (Stale-Werte vermeiden, 3x setCount(count+1) = +1 nicht +3).
+- Objekte/Arrays: kopieren mit Spread, nie mutieren.
+  Array: [...a, x], a.filter(), a.map(); Objekt: {...o, feld: v}.
+- Initial-State lazy: useState(() => teureBerechnung()).
+- Reset per key: <Form key={id} /> erzwingt frischen State.
+- Lifting State Up: gemeinsamen State zum nächsten gemeinsamen Vorfahren.
+- Controlled Components / Two-Way-Binding (3.10): value + onChange.
+- Listen: key = stabile ID, NICHT Index (siehe 15.9 Anti-Patterns).
+- Bedingtes Rendern: &&, Ternary, Early Return.
+  Falle: {count && <X/>} rendert bei 0 eine "0".
+Übung (25'): Todo-Liste (hinzufügen, abhaken, löschen, Filter).
+  Komponenten: TodoList, TodoItem, AddTodo. Callback-Props nach oben.
+
+[15:15-16:30] K4 Tailwind CSS (13 Folien)
+---------------------------------------------------------------------
+Hinweis: Tailwind ist der Standard des Kurses; 4.10-4.13 (Stylesheets,
+Inline, CSS Modules, CSS-in-JS) nur als Einordnung (max. 10').
+Kernaussagen:
+- Utility-First: Klassen im Markup statt eigener CSS-Dateien.
+  Vorteil: kein Naming, kein toter CSS-Code, lokal verständlich.
+- Setup mit Vite-Plugin (@tailwindcss/vite) und @import "tailwindcss".
+- Mobile-first: unprefixed = alle, md: ab Breakpoint.
+- Varianten: hover:, focus:, disabled:, dark:, group-hover:, peer-.
+- Dynamische Klassen: Tailwind scannt statisch! NIE "bg-" + color
+  zusammenbauen. Stattdessen Lookup-Objekt mit vollständigen Klassen.
+  clsx für Bedingungen, tailwind-merge für Konflikte.
+- Wiederverwendung durch React-Komponenten (Button, Card, Badge),
+  nicht durch @apply.
+- Dark Mode (4.9): dark: Variante, @theme für Design Tokens.
+Übung (15'): Karten-Grid responsive (1/2/3 Spalten) + Button-Komponente
+  mit Varianten (primary/secondary/danger).
+Tagesabschluss (5'): Fragen, Ausblick, ggf. Hausaufgabe: Todo-App stylen.
+
+
+3. TAG 2 - VERTIEFUNG UND DATEN
+=====================================================================
+
+[09:00-09:20] Wiederholung
+---------------------------------------------------------------------
+Quiz mündlich: Was löst ein Re-Render aus? Warum Spread? Warum key?
+Was passiert bei {0 && <X/>}?
+
+[09:20-10:30] K5 React-Komponenten im Detail (5.1-5.8)
+---------------------------------------------------------------------
+- 5.3 Composition statt Vererbung: children (Containment), Slots über
+  Props (header=, footer=), Specialization. In React erbt man nie.
+- 5.4 useEffect (längste Folie von K5):
+  * Effekte = Synchronisation mit externen Systemen (Fetch, Timer,
+    Subscriptions, DOM-APIs), kein Lifecycle-Ersatz.
+  * 3 Varianten: ohne Array (jeder Render), [] (einmal beim Mount),
+    [a,b] (bei Änderung).
+  * Cleanup-Funktion zurückgeben (Timer, Listener, Abort).
+  * Stale Closures und endlose Render-Schleifen (Objekt/Array in
+    Dependencies, setState im Effect ohne Bedingung).
+  * StrictMode ruft Effekte im Dev doppelt auf -> Absicht! Cleanup testen.
+- 5.5 "You Might Not Need an Effect": abgeleitete Werte beim Rendern
+  berechnen; Aktionen in Event-Handler; Reset per key.
+- 5.6 useRef: Wert ohne Re-Render / Zugriff auf DOM (focus()).
+- 5.7 Fragment; 5.8 Context (createContext, Provider, useContext) als
+  "Dependency Injection", Nachteil: alle Consumer rendern bei Wertänderung.
+Demo: Timer-Komponente mit/ohne Cleanup, StrictMode-Doppelaufruf zeigen.
+Übung (20'): Fenstergröße/Dark-Mode-Context bauen.
+
+[10:45-11:30] K5 (5.9-5.13)
+---------------------------------------------------------------------
+- Error Boundaries (5.9): nur Klassen oder react-error-boundary; fangen
+  keine Event-Handler-, Async- oder SSR-Fehler.
+- Lazy + Suspense (5.10): Code Splitting, fallback.
+- React.memo (5.11) nur mit stabilen Props, sonst wirkungslos.
+- React Compiler (5.12): automatisches Memoizing, Aktivierung per
+  Babel-Plugin in Vite. Heißt: memo/useMemo/useCallback weitgehend
+  entbehrlich. Trotzdem erklären, was sie tun (Legacy-Code!).
+- Custom Hooks (5.13): useToggle als Einstieg.
+
+[11:30-12:30] K6 React mit TypeScript (9 Folien)
+---------------------------------------------------------------------
+Hinweis: Wer TS schon kennt, schneller durchgehen; bei JS-Teilnehmern
+mehr Zeit für 6.2.
+- Props: type Props = {...}; Destructuring + Default.
+- Events: React.ChangeEvent<HTMLInputElement>, MouseEvent, FormEvent.
+- Hooks typisieren: useState<User | null>(null), useRef<HTMLInputElement>(null),
+  createContext<Ctx | null>(null) + Guard-Hook.
+- API-Daten: unknown statt any; Zod-Schema als Single Source of Truth
+  (z.infer) - Vorgriff auf K11.
+- Discriminated Unions für Request-State:
+  { status:'loading' } | { status:'error', error } | { status:'success', data }
+  + exhaustive switch mit never.
+- as const, satisfies, typeof/keyof/ReturnType, Utility Types
+  (Partial, Pick, Omit, Record), ComponentProps<'button'> erweitern.
+Falle: "as" Casts umgehen den Compiler - sparsam verwenden.
+
+[12:30-13:30] MITTAG
+
+[13:30-15:00] K7 Hooks und moderne Patterns (20 Folien)
+---------------------------------------------------------------------
+Nicht alles gleich tief. Gewichtung:
+  tief:   useReducer (7.6/7.7/7.11), Custom Hooks (7.12), Anti-Patterns (7.20)
+  mittel: useMemo/useCallback (7.8-7.10), useTransition, useDeferredValue
+  kurz:   useEffectEvent, useSyncExternalStore, use(), Actions,
+          useOptimistic (React-19-Überblick; nicht vertiefen)
+Kernaussagen:
+- useReducer: wenn mehrere Teilzustände zusammengehören oder Übergänge
+  komplex sind. Actions als Discriminated Union, reducer ist reine Funktion.
+- useCallback/useMemo: Referenzstabilität, nur mit memo oder als
+  Dependency sinnvoll; erst messen (siehe 15.8).
+- useTransition: UI bleibt reaktionsfähig bei schwerem Update
+  (isPending). useDeferredValue: verzögerte Kopie eines Werts.
+- useEffectEvent: aktuellen Wert im Effect lesen ohne neu zu
+  synchronisieren. (Neu/stable-Status in der aktuellen Version prüfen!)
+- use() (React 19): Promise/Context lesen; Actions + useOptimistic.
+- Hook-Anti-Patterns (7.20): Hooks in Bedingungen/Schleifen, fehlende
+  Dependencies unterdrücken (eslint-disable), Hooks als Ersatz für
+  Funktionen ohne State.
+Übung (30'): Custom Hook useLocalStorage oder useFetch, danach mit
+  useReducer als Request-State neu bauen.
+
+[15:15-15:45] K8 useHooks (6 Folien)
+---------------------------------------------------------------------
+- Philosophie: vorhandenen Hook nutzen vor Eigenbau (8.5 Entscheidungshilfe).
+- Demos: useDebounce (Suchfeld, weniger Requests), useMediaQuery
+  (Responsive/Farbschema), useLocalStorage.
+- 8.6: Kriterien für externe Hooks (Wartung, Größe, Typen, Lizenz).
+
+[15:45-16:30] K9 HTTP, APIs, Server State - Teil 1 (9.1-9.8)
+---------------------------------------------------------------------
+- fetch + async/await, JSON, POST, DELETE.
+- Jeder Request hat mind. 4 Zustände: idle/loading/error/success (+ leer).
+  -> Loading-/Error-/Empty-States (9.5), Discriminated Union (K6.7).
+- Fetch wirft bei HTTP 404/500 NICHT! response.ok prüfen. (9.7)
+- AbortController im Effect-Cleanup (9.6) gegen Race Conditions.
+- Axios nur als Einordnung (9.8).
+Tagesabschluss (10'): Ausblick auf TanStack Query als "die richtige
+Lösung". Hausaufgabe: Todo/Posts-Liste mit fetch + 4 Zuständen.
+
+
+4. TAG 3 - APP-BAUSTEINE UND PRODUKTION
+=====================================================================
+
+[09:00-09:20] Wiederholung / Einstiegsfrage
+---------------------------------------------------------------------
+"Warum reicht useEffect + fetch für echte Apps nicht?" -> Überleitung.
+
+[09:20-10:30] K9 Teil 2 - TanStack Query (9.9-9.14)
+---------------------------------------------------------------------
+- Server State = Kopie fremder Daten, die veralten können.
+- QueryClientProvider, useQuery({queryKey, queryFn}).
+- Status: isPending (noch keine Daten) vs isFetching (irgendein Fetch).
+- queryKey = Abhängigkeitsarray; Parameter in den Key!
+- staleTime (wann veraltet) vs gcTime (wann aus Cache entfernt).
+- useMutation + invalidateQueries nach Schreiben (9.12).
+- Optimistic Updates (9.13): Cache mit Rollback oder über variables.
+- 9.14: Client vs Server State; Anti-Pattern: Query-Daten in Zustand/
+  useState kopieren.
+Live-Coding: Liste + Detail + "Hinzufügen" mit Mutation, DevTools zeigen.
+
+[10:45-11:30] K10 Routing mit React Router (14 Folien)
+---------------------------------------------------------------------
+- SPA-Routing: URL <-> Komponente, kein Server-Roundtrip.
+- createBrowserRouter/RouterProvider (Data Router).
+- Link/NavLink (aktive Klasse), relative vs absolute Pfade.
+- useParams, useSearchParams, useNavigate.
+- Nested Routes + <Outlet> für Layouts.
+- Redirects (Navigate), 404 mit path="*", Guards für geschützte Bereiche.
+- Lazy Routes (lazy:), Loader/Actions (10.14) - Einordnung gegenüber
+  TanStack Query: entweder-oder, nicht mischen ohne Grund.
+Übung (15'): 3 Seiten + Layout + Detailseite /posts/:id + 404.
+
+[11:30-12:30] K11 Formulare und Validierung (14 Folien)
+---------------------------------------------------------------------
+Reihenfolge: erst Grundlagen kurz (11.1-11.9, 20'), dann Library.
+- Controlled Inputs: value/onChange, ein State-Objekt für viele Felder.
+- Validierung im Render ableiten (besser) statt im Handler (11.4).
+- Checkbox: checked statt value; Select/Radio; File-Upload mit
+  FileReader/URL.createObjectURL.
+- React Hook Form: register, handleSubmit, formState.errors;
+  uncontrolled = wenig Re-Renders.
+- Zod: Schema -> Typ (z.infer), zodResolver, Fehlermeldungen.
+- Server-Fehler: setError / root-Fehler in useMutation (11.12).
+- Wiederverwendbare FormField, FormProvider, Controller, useFieldArray.
+- 11.14 TanStack Form nur als Alternative erwähnen.
+Übung (20'): Registrierungsformular mit Zod (E-Mail, Passwort >= 8,
+  Passwort-Bestätigung per refine).
+
+[12:30-13:30] MITTAG
+
+[13:30-14:30] K12 State Management mit Zustand (19 Folien)
+---------------------------------------------------------------------
+- 12.1-12.3: Arten von State, Entscheidungshilfe
+  useState -> Context -> globaler Store.
+  Context rendert alle Consumer neu -> Zustand mit Selektoren.
+- Zustand: create((set,get)=>({...})); Selektoren
+  useStore(s => s.count); NIE ganzen Store abonnieren; useShallow für
+  mehrere Werte.
+- Middleware: immer (verschachtelte Updates), persist (localStorage,
+  partialize), devtools. Reihenfolge der Middleware beachten (12.8).
+- Slices-Pattern für große Stores (12.9).
+- Zusammenspiel mit TanStack Query (12.10): Store hält Filter/UI-State,
+  Query holt Daten, Filter steckt im queryKey.
+- 12.11-12.15 klassisches Redux: nur Datenfluss erklären (Action ->
+  Reducer -> Store -> Subscription), 5' reichen.
+- 12.16 Redux Toolkit: wann sinnvoll (Bestandsprojekte, große Teams).
+- 12.17-12.19 Jotai, useLocalStorage: Überblick.
+Übung (20'): Warenkorb-Store mit Zustand + persist.
+
+[14:30-15:15] K13 Testing (12 Folien)
+---------------------------------------------------------------------
+- Testing Trophy statt Pyramide: viel Integration, wenig Mocking.
+- Ebenen: TS/ESLint -> Vitest (Unit) -> RTL + MSW (Komponenten) ->
+  Playwright (E2E, nur kritische Pfade).
+- RTL: Test aus Nutzersicht. Queries-Priorität: getByRole > getByLabelText
+  > getByText > getByTestId. userEvent statt fireEvent. findBy* für Async.
+- MSW: HTTP-Aufrufe auf Netzwerkebene mocken (statt fetch zu mocken).
+- Hooks: renderHook; Stores: Zustand vor jedem Test zurücksetzen.
+- Playwright: Installation, ein Beispiel-Test, Trace Viewer.
+- CI: GitHub Actions (13.12).
+Live: einen Komponententest für das Formular schreiben.
+
+[15:15-15:45] K14 Build, Deployment, Produktion (9 Folien)
+---------------------------------------------------------------------
+- Vite: dev / build / preview. Env-Variablen nur mit Präfix VITE_
+  (landen im Bundle -> KEINE Secrets!).
+- Code Splitting (dynamic import), Bundle-Analyse (visualizer).
+- SPA-Fallback: Server muss auf index.html umleiten (Deep-Link-404!).
+- Dockerfile Multi-Stage (node build -> nginx), Cloud-Plattformen,
+  CI/CD-Stufen (lint, typecheck, test, build, deploy).
+- Source Maps: für Fehleranalyse, aber nicht öffentlich ausliefern
+  (oder an Sentry hochladen).
+
+[15:45-16:15] K15 Best Practices und Architektur (9 Folien)
+---------------------------------------------------------------------
+- Feature-basierte Ordner (features/todos/{components,hooks,api}).
+- Schichten: UI <-> Hooks/Business <-> API.
+- Prop Drilling vermeiden: Composition, Context, Store.
+- Robuste Ladezustände, Accessibility (semantisches HTML, Labels,
+  Fokus, Tastatur), Performance (messen!), Security (XSS:
+  dangerouslySetInnerHTML meiden, keine Tokens im localStorage ohne
+  Abwägung).
+- Anti-Patterns (15.9): abgeleiteter State, Effekte für Datenfluss,
+  Index als Key, mutierter State.
+
+[16:15-16:30] K16 Stack-Zusammenfassung und Abschluss
+---------------------------------------------------------------------
+- Folie 16.1 (Tabelle + Datenfluss-Diagramm) als Schlussbild.
+- Offene Fragen, Feedbackbogen, Links, Verweis auf Zusatzkapitel
+  (K17-22) zum Selbststudium.
+
+
+5. ZUSATZKAPITEL (Backup / Wunschthemen)
+=====================================================================
+K17 Legacy (14 Folien, ca. 45'): Klassenkomponenten + Lifecycle,
+    HOC, Emotion/Styled Components, klassisches Redux (Middleware,
+    Thunks). Nur anbieten, wenn Teilnehmer Altcode pflegen.
+K18 Authentifizierung (4 Folien, ca. 30'): JWT vs OAuth vs OIDC,
+    Login-Formular, Auth-Service, geschützte Routen. Achtung:
+    Token-Speicherung (httpOnly-Cookie vs localStorage) diskutieren.
+K19 Advanced Patterns (1 Folie, 7,9 KB): Patterns, Komponenten mit
+    externem State. Kurz, eher Diskussion.
+K20 React 19: Compiler, Activity, ViewTransition (Überblick, 15').
+K21 Next.js: SSR/RSC/SSG - nur Konzeptüberblick (15').
+K22 SemVer und npm (22 Folien, ca. 60'): Theorie + Praxis
+    (^ ~, package-lock, npm ci, audit, outdated, overrides). Sehr
+    gut als Lückenfüller oder eigener Nachmittag.
+
+
+6. LIVE-CODING-DREHBUCH (rotes Beispielprojekt)
+=====================================================================
+Empfehlung: EINE wachsende App über 3 Tage (z. B. "Posts/Todos").
+  Tag 1: Todo-Liste mit useState, Tailwind-Styling
+  Tag 2: Hooks, Context (Theme), API-Anbindung (fetch -> Query)
+  Tag 3: Router (Liste/Detail/404), Formular (RHF+Zod),
+         Zustand (Filter/Warenkorb), 1-2 Tests, Build + Docker
+Vorteil: Teilnehmer sehen Zusammenspiel; Folien liefern fertigen Code
+zum Kopieren, deshalb Code nicht vorlesen, sondern erklären WARUM.
+Backup: fertigen Stand je Kapitel in git-Tags/Branches bereithalten
+(tag-k03, tag-k09 ...), damit Nachzügler einsteigen können.
+Fake-API: jsonplaceholder.typicode.com oder json-server.
+
+
+7. WIEDERKEHRENDE FALLEN UND ANTWORTEN
+=====================================================================
+- "Mein Effect läuft doppelt." -> StrictMode im Dev, bewusst.
+- "State ist nach setX noch alt." -> Update gebündelt; Funktionsform.
+- "Liste springt/verliert Eingaben." -> key falsch (Index/Zufall).
+- "Komponente rendert ständig neu." -> neues Objekt/Array/Funktion als
+  Prop oder Dependency; Effect setzt State ohne Bedingung.
+- "Tailwind-Klasse fehlt im Build." -> dynamisch zusammengebaut.
+- "Deep-Link 404 in Produktion." -> SPA-Fallback fehlt (K14.5).
+- "fetch wirft bei 404 nicht." -> response.ok prüfen.
+- "Context macht alles langsam." -> Zustand/Selektoren oder
+  Context aufteilen.
+- "Brauche ich useMemo überall?" -> Nein; erst messen, React Compiler.
+- "Redux oder Zustand?" -> Neu: Zustand/TanStack Query; Redux Toolkit
+  für Bestandsprojekte und große Teams.
+- "Wann Next.js?" -> SEO, SSR, RSC, Full-Stack; SPA reicht oft für
+  interne Tools.
+
+
+8. DIDAKTIK-TIPPS
+=====================================================================
+- Pro Kapitel: Konzept (5-10') -> Live-Demo (10') -> Übung (10-20').
+- Folien mit viel Code (2.6, 3.7, 5.4, 9.7, 11.13, 19.1) nicht
+  durchlesen; nur Aufbau zeigen und Highlights erklären.
+- Alle 60-75 Minuten Pause; nach dem Mittag etwas Interaktives.
+- Fragen sammeln ("Parkplatz") und am Tagesende beantworten.
+- Zum Wachhalten: Teilnehmer vorhersagen lassen, was nach einem
+  Klick im Render passiert, bevor man es zeigt.
+- Tempo-Check: Nach jedem Kapitel kurz fragen "Daumen hoch/runter".
+- Schnelle Teilnehmer: Bonus-Aufgaben (Tests, Optimistic Update).
+
+
+9. CHECKLISTE VOR KURSBEGINN
+=====================================================================
+[ ] Node LTS, npm, git, VS Code + ESLint/Tailwind-Extension
+[ ] Browser mit React DevTools und TanStack-Query-DevTools
+[ ] Startprojekt (Vite + React + TS + Tailwind) vorbereitet
+[ ] Backup-Branches/Tags je Kapitel
+[ ] Fake-API erreichbar (oder lokal json-server)
+[ ] Slides im Browser getestet (slidy/Präsentationstool), Zoom/Schrift
+[ ] Beamer/Screensharing, Schriftgröße im Editor >= 18 pt
+[ ] Teilnehmerliste, Feedbackbogen, Zertifikate
+[ ] Prüfen, welche React-19-Features im Kurs-Projekt tatsächlich
+    verfügbar sind (useEffectEvent, Compiler, Activity, ViewTransition)
+    - Versionen vor Kursbeginn gegenprüfen!
+
+=====================================================================
+Hinweis: Zeiten und Gewichtung sind Vorschläge anhand Folienanzahl und
+-umfang. Bitte an Gruppe und Vorkenntnisse anpassen.
+=====================================================================
