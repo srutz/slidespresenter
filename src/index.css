@@ -272,9 +272,11 @@ body {
 	@apply rounded bg-muted px-1 py-0.5 text-[0.9em];
 }
 .slide pre {
-	@apply my-3 max-w-full overflow-x-auto rounded bg-muted p-4;
+	line-height: calc(1.6em - 1px);
+	@apply my-3 max-w-full overflow-x-auto rounded bg-muted p-3.5;
 }
 .slide pre code {
+	font-size: calc(0.9em - 2px);
 	@apply bg-transparent p-0;
 }
 .slide table {

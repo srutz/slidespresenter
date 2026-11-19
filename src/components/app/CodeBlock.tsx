@@ -1,7 +1,6 @@
-import { Check, Copy, Ellipsis, Type } from "lucide-react";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import { Check, Copy, Ellipsis, Type } from "lucide-react";
 import { type ComponentProps, isValidElement, useRef, useState } from "react";
-import { Mermaid } from "./Mermaid";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -13,6 +12,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Mermaid } from "./Mermaid";
 
 const SIZES = [
 	{ value: "1", label: "Normal" },
@@ -36,10 +36,7 @@ export function CodeBlock({
 	return <CodeBlockInner {...props}>{children}</CodeBlockInner>;
 }
 
-function CodeBlockInner({
-	children,
-	...props
-}: ComponentProps<"pre">) {
+function CodeBlockInner({ children, ...props }: ComponentProps<"pre">) {
 	const ref = useRef<HTMLPreElement>(null);
 	const [size, setSize] = useLocalStorage("codeblock-font-size", "1");
 	const [copied, setCopied] = useState(false);
@@ -60,7 +57,7 @@ function CodeBlockInner({
 				{...props}
 				ref={ref}
 				style={{
-					fontSize: `calc(${size}em - 2px)`,
+					fontSize: `${size}em`,
 					marginTop: 0,
 					marginBottom: 0,
 				}}
